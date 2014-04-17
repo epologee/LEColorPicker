@@ -175,9 +175,13 @@ NSUInteger squareDistanceInRGBSpaceBetweenColor(LEColor colorA, LEColor colorB)
                  onComplete:(void (^)(LEColorScheme *colorsPickedDictionary))completeBlock
 {
     if ([self isAppActive]) {
+        __weak LEColorPicker *weaklyReferencedSelf = self;
         dispatch_async(taskQueue, ^{
+            // Prevent self from being dealloc'd during execution of `colorSchemeFromImage:`
+            LEColorPicker *stronglyReferencedSelf = weaklyReferencedSelf;
+
             // Color calculation process
-            LEColorScheme *colorScheme = [self colorSchemeFromImage:image];
+            LEColorScheme *colorScheme = [stronglyReferencedSelf colorSchemeFromImage:image];
             
             // Call complete block and pass colors result
             dispatch_async(dispatch_get_main_queue(), ^{
